@@ -13,16 +13,11 @@ const User = mongoose.model('User', { // users
     class: Number
 })
 
-const Child = mongoose.model('Child', { // children
-    firstName: String,
-    lastName: String,
-    class: Number
-})
-
 app.get('/', (req, res) => {
   res.send('Our first Node Express Server!')
 })
 
+// READ (GET)
 app.get('/users', async (req, res) => {
     try {
         const users = await User.find()
@@ -37,6 +32,81 @@ app.get('/users', async (req, res) => {
         })
     }
 })
+
+// CREATE (POST)
+app.post('/users', async (req, res) => {
+    const { firstName, lastName, classNumber } = req.body
+    try {
+        await User.create({
+            firstName,
+            lastName,
+            class: classNumber
+        })
+        res.json({
+            status: 'SUCCESS'
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 'FAILED',
+            message: 'Something went wrong!'
+        })
+    }
+})
+
+// UPDATE (PATCH)
+app.patch('/users/:id', async (req, res) => {
+    const { id } = req.params
+    const { firstName, lastName, classNumber } = req.body
+    try {
+        await User.findByIdAndUpdate(id, {
+            firstName,
+            lastName,
+            class: classNumber
+        })
+        res.json({
+            status: 'SUCCESS'
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 'FAILED',
+            message: 'Something went wrong!'
+        })
+    }
+})
+
+// DELETE (DELETE)
+app.delete('/users/:id', async (req, res) => {
+    const { id } = req.params
+    try {
+        await User.findByIdAndDelete(id)
+        res.json({
+            status: 'SUCCESS'
+        })
+    } catch (error) {
+        res.status(500).json({
+            status: 'FAILED',
+            message: 'Something went wrong!'
+        })
+    }
+})
+
+// SEARCH
+// app.get('/users', async (req, res) => {
+//     try {
+//         console.log(req.query)
+//         const users = await User.find(req.query)
+//         res.json({
+//             status: 'SUCCESS',
+//             data: users
+//         })
+//     } catch (error) {
+//         res.status(500).json({
+//             status: 'FAILED',
+//             message: 'Something went wrong!'
+//         })
+//     }
+// })
+
 
 app.listen(process.env.PORT, () => {
     mongoose
@@ -61,23 +131,23 @@ app.listen(process.env.PORT, () => {
 */
 
 /*
-    REST APIs:
+    REST APIs: Representational State Transfer
     CRUD Opeartions:
         - GET (Read)
         - POST (Create)
-        - PUT (Updating)
-        - DELETE (Deleting)
+        - PUT/PATCH (Update)
+        - DELETE (Delete)
 
     E-Commerce:
     - Customers
         - GET /customers (Read)
         - POST /customers (Create)
-        - PUT /customers/:id (Updating)
-        - DELETE /customers/:id (Deleting)
+        - PUT /customers/:id (Update)
+        - DELETE /customers/:id (Delete)
 
     - Sellers
         - GET /sellers (Read)
         - POST /sellers (Create)
-        - PUT /sellers/:id (Updating)
-        - DELETE /sellers/:id (Deleting)
+        - PUT /sellers/:id (Update)
+        - DELETE /sellers/:id (Delete)
 */
